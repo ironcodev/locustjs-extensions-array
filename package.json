@@ -1,6 +1,6 @@
 {
   "name": "locustjs-extensions-array",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This library contains extensions for Array",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   "homepage": "https://github.com/ironcodev/locustjs-extensions-array#readme",
   "dependencies": {
     "locustjs-base": "^1.0.2",
-    "locustjs-extensions-options": "^1.0.1"
+    "locustjs-extensions-options": "^1.0.2"
   }
 }
