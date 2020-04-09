@@ -1,6 +1,6 @@
 {
   "name": "locustjs-extensions-array",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This library contains extensions for Array",
   "main": "index.js",
   "scripts": {
