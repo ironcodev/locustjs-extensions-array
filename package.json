@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/ironcodev/locustjs-extensions-array#readme",
   "dependencies": {
-    "locustjs-base": "^1.0.1",
+    "locustjs-base": "^1.0.2",
     "locustjs-extensions-options": "^1.0.1"
   }
 }
