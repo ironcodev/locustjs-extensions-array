@@ -1,18 +1,18 @@
 import { isArray, isFunction } from 'locustjs-base'
-import { configureOptions, shouldExend } from 'locustjs-extensions-options'
-import { deepAssign } from 'locust-extensions-object'
+import { configureOptions, shouldExtend } from 'locustjs-extensions-options'
+import { deepAssign } from 'locustjs-extensions-object'
 
 function configureArrayExtensions(options) {
 	const _options = configureOptions(options)
 	
-	if (!Array.prototype.clone || shouldExend('clone', _options)) {
+	if (!Array.prototype.clone || shouldExtend('clone', _options)) {
 		Array.prototype.clone = function () {
 			return this.slice(0);
 		}
 	}
 	
 	// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-	if (!Array.prototype.shuffle || shouldExend('shuffle', _options)) {
+	if (!Array.prototype.shuffle || shouldExtend('shuffle', _options)) {
 		Array.prototype.shuffle = function () {
 			let currentIndex = this.length, temporaryValue, randomIndex;
 
@@ -33,19 +33,19 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.insertAt || shouldExend('insertAt', _options)) {
+	if (!Array.prototype.insertAt || shouldExtend('insertAt', _options)) {
 		Array.prototype.insertAt = function (index, item) {
 			return this.splice(index, 0, item);
 		}
 	}
 	
-	if (!Array.prototype.removeAt || shouldExend('removeAt', _options)) {
+	if (!Array.prototype.removeAt || shouldExtend('removeAt', _options)) {
 		Array.prototype.removeAt = function (index) {
 			return this.splice(index, 1)[0];
 		}
 	}
 	
-	if (!Array.range || shouldExend('range', _options)) {
+	if (!Array.range || shouldExtend('range', _options)) {
 		Array.range = function (from, to) {
 		let result = new Array(to - from);
 
@@ -57,7 +57,7 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.all || shouldExend('all', _options)) {
+	if (!Array.prototype.all || shouldExtend('all', _options)) {
 		Array.prototype.all = function (fn) {
 			let result = true;
 			
@@ -75,7 +75,7 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.any || shouldExend('any', _options)) {
+	if (!Array.prototype.any || shouldExtend('any', _options)) {
 		Array.prototype.any = function (fn) {
 			let result = false;
 			
@@ -93,8 +93,8 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.fromIndexOf || shouldExend('fromIndexOf', _options)) {
-		Array.prototype.fromIndexOf = function (x, startIndex) {
+	if (!Array.prototype.indexOfFrom || shouldExtend('indexOfFrom', _options)) {
+		Array.prototype.indexOfFrom = function (x, startIndex) {
 			let result = -1;
 			let start = 0;
 			let isFn = isFunction(x);
@@ -120,7 +120,7 @@ function configureArrayExtensions(options) {
 	}
 
 	
-	if (!Array.prototype.Objectify || shouldExend('Objectify', _options)) {
+	if (!Array.prototype.Objectify || shouldExtend('Objectify', _options)) {
 		/*	this method has close relation with String.prototype.nestedSplit in locustjs-extensions-string
 			examples
 			input:
