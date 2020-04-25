@@ -36,7 +36,6 @@ const range = function (from, to) {
 
 	return result;
 }
-
 const insertAt = function(arr, index, item) {
 	if (!isArray(arr)) {
 		throw `expected array but received ${typeof arr}`
@@ -194,7 +193,10 @@ const Objectify = function (arr) {
 	
 	return result;
 }
-	
+const sortBy = function (arr, fn) {
+	return arr.sort((a, b) => fn(a) > fn(b) ? 1: -1);
+}
+
 function configureArrayExtensions(options) {
 	const _options = configureOptions(options)
 	
@@ -273,6 +275,12 @@ function configureArrayExtensions(options) {
 		
 		Array.prototype.Objectify = function () {
 			return Objectify(this);
+		}
+	}
+	
+	if (!Array.prototype.sortBy || shouldExtend('sortBy', _options)) {
+		Array.prototype.sortBy = function (fn) {
+			return sortBy(this, fn);
 		}
 	}
 }
