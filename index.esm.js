@@ -162,7 +162,8 @@ const Objectify = function (arr) {
 			if (!isArray(temp1)) {
 				temp = deepAssign(temp, temp1, temp2);
 				
-				if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? Object.keys(temp2).length: 0)) {
+				if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? 
+Object.keys(temp2).length: 0)) {
 					if (isArray(result)) {
 						result = temp;
 						continue;

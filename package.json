@@ -1,8 +1,9 @@
 {
   "name": "locustjs-extensions-array",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "This library contains extensions for Array",
-  "main": "index.js",
+  "main": "index.cjs.js",
+  "module": "index.esm.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,8 +23,8 @@
   },
   "homepage": "https://github.com/ironcodev/locustjs-extensions-array#readme",
   "dependencies": {
-    "locustjs-base": "^1.0.3",
+    "locustjs-base": "^1.0.4",
     "locustjs-extensions-object": "^1.0.7",
-    "locustjs-extensions-options": "^1.0.3"
+    "locustjs-extensions-options": "^1.0.5"
   }
 }
