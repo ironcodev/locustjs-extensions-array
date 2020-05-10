@@ -3,8 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Objectify = exports.indexOfFrom = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = 
-exports.shuffle = exports.default = void 0;
+exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
 
 var _locustjsBase = require("locustjs-base");
 
@@ -12,9 +11,9 @@ var _locustjsExtensionsOptions = require("locustjs-extensions-options");
 
 var _locustjsExtensionsObject = require("locustjs-extensions-object");
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { 
-_typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol 
-=== "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function 
+_typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === 
+Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var shuffle = function shuffle(arr) {
   if (!(0, _locustjsBase.isArray)(arr)) {
@@ -119,38 +118,6 @@ var any = function any(arr, fn) {
 };
 
 exports.any = any;
-
-var indexOfFrom = function indexOfFrom(arr, x) {
-  var startIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
-
-  var result = -1;
-  var start = 0;
-  var isFn = (0, _locustjsBase.isFunction)(x);
-
-  if (typeof startIndex == 'number') {
-    start = startIndex;
-  }
-
-  for (var i = start; i < arr.length; i++) {
-    if (isFn) {
-      if (x(arr[i])) {
-        result = i;
-        break;
-      }
-    } else if (arr[i] === x) {
-      result = i;
-      break;
-    }
-  }
-
-  return result;
-};
-
-exports.indexOfFrom = indexOfFrom;
 
 var Objectify = function Objectify(arr) {
   if (!(0, _locustjsBase.isArray)(arr)) {
@@ -269,13 +236,6 @@ function configureArrayExtensions(options) {
   if (!Array.prototype.any || (0, _locustjsExtensionsOptions.shouldExtend)('any', _options)) {
     Array.prototype.any = function (fn) {
       return any(this, fn);
-    };
-  }
-
-  if (!Array.prototype.indexOfFrom || (0, _locustjsExtensionsOptions.shouldExtend)('indexOfFrom', _options)) {
-    Array.prototype.indexOfFrom = function (x) {
-      var startIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      return indexOfFrom(this, x, startIndex = 0);
     };
   }
 

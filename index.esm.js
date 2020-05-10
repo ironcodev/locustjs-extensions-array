@@ -90,33 +90,6 @@ const any = function (arr, fn) {
 	
 	return result;
 }
-const indexOfFrom = function (arr, x, startIndex = 0) {
-	if (!isArray(arr)) {
-		throw `expected array but received ${typeof arr}`
-	}
-	
-	let result = -1;
-	let start = 0;
-	let isFn = isFunction(x);
-
-	if (typeof startIndex == 'number') {
-		start = startIndex;
-	}
-
-	for (let i = start; i < arr.length; i++) {
-		if (isFn) {
-			if (x(arr[i])) {
-				result = i;
-				break;
-			}
-		} else if (arr[i] === x) {
-			result = i;
-			break;
-		}
-	}
-
-	return result;
-}
 const Objectify = function (arr) {
 	if (!isArray(arr)) {
 		throw `expected array but received ${typeof arr}`
@@ -242,12 +215,6 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.indexOfFrom || shouldExtend('indexOfFrom', _options)) {
-		Array.prototype.indexOfFrom = function (x, startIndex = 0) {
-			return indexOfFrom(this, x, startIndex = 0);
-		}
-	}
-
 	if (!Array.prototype.Objectify || shouldExtend('Objectify', _options)) {
 		/*	this method has close relation with String.prototype.nestedSplit in locustjs-extensions-string
 			examples
@@ -294,6 +261,5 @@ export {
 	removeAt,
 	all,
 	any,
-	indexOfFrom,
 	Objectify
 }
