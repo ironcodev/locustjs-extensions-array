@@ -11,9 +11,7 @@ var _locustjsExtensionsOptions = require("locustjs-extensions-options");
 
 var _locustjsExtensionsObject = require("locustjs-extensions-object");
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function 
-_typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === 
-Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var shuffle = function shuffle(arr) {
   if (!(0, _locustjsBase.isArray)(arr)) {
@@ -42,7 +40,7 @@ exports.shuffle = shuffle;
 var range = function range(from, to) {
   from = parseInt(from);
   to = parseInt(to);
-  var result = new Array(to - from);
+  var result = [];
 
   for (var i = from; i < to; i++) {
     result.push(i);
