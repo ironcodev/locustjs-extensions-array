@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
+exports.sortBy = exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
 
 var _locustjsBase = require("locustjs-base");
 
@@ -235,6 +235,8 @@ var sortBy = function sortBy(arr) {
 
   return arr.sort(sort_fn);
 };
+
+exports.sortBy = sortBy;
 
 function configureArrayExtensions(options) {
   var _options = (0, _locustjsExtensionsOptions.configureOptions)(options);

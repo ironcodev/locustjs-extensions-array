@@ -286,5 +286,6 @@ export {
 	removeAt,
 	all,
 	any,
-	Objectify
+	Objectify,
+	sortBy
 }
