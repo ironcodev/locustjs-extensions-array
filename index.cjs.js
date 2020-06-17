@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sortBy = exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
+exports.contains = exports.sortBy = exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
 
 var _locustjsBase = require("locustjs-base");
 
@@ -238,6 +238,40 @@ var sortBy = function sortBy(arr) {
 
 exports.sortBy = sortBy;
 
+var contains = function contains(arr) {
+  var result = [];
+
+  for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    values[_key2 - 1] = arguments[_key2];
+  }
+
+  for (var i = 0; i < values.length; i++) {
+    if ((0, _locustjsBase.isPrimitive)(values[i])) {
+      values[i] = values[i].toString().toLowerCase();
+    }
+  }
+
+  for (var _i = 0; _i < arr.length; _i++) {
+    if ((0, _locustjsBase.isPrimitive)(arr[_i])) {
+      for (var j = 0; j < values.length; j++) {
+        if (arr[_i].toString().toLowerCase() == values[j]) {
+          result.push(true);
+        }
+      }
+    } else {
+      for (var _j = 0; _j < values.length; _j++) {
+        if ((0, _locustjsBase.equals)(arr[_i], values[_j])) {
+          result.push(true);
+        }
+      }
+    }
+  }
+
+  return result.length == values.length;
+};
+
+exports.contains = contains;
+
 function configureArrayExtensions(options) {
   var _options = (0, _locustjsExtensionsOptions.configureOptions)(options);
 
@@ -282,6 +316,16 @@ function configureArrayExtensions(options) {
     };
   }
 
+  if (!Array.prototype.contains || (0, _locustjsExtensionsOptions.shouldExtend)('contains', _options)) {
+    Array.prototype.contains = function () {
+      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return contains.apply(void 0, [this].concat(args));
+    };
+  }
+
   if (!Array.prototype.Objectify || (0, _locustjsExtensionsOptions.shouldExtend)('Objectify', _options)) {
     /*	this method has close relation with String.prototype.nestedSplit in locustjs-extensions-string
     	examples
@@ -314,8 +358,8 @@ function configureArrayExtensions(options) {
 
   if (!Array.prototype.sortBy || (0, _locustjsExtensionsOptions.shouldExtend)('sortBy', _options)) {
     Array.prototype.sortBy = function () {
-      for (var _len2 = arguments.length, fns = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        fns[_key2] = arguments[_key2];
+      for (var _len4 = arguments.length, fns = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        fns[_key4] = arguments[_key4];
       }
 
       return sortBy.apply(void 0, [this].concat(fns));

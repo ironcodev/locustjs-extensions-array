@@ -1,4 +1,4 @@
-import { isArray, isFunction } from 'locustjs-base'
+import { isArray, isFunction, isPrimitive, equals } from 'locustjs-base'
 import { configureOptions, shouldExtend } from 'locustjs-extensions-options'
 import { deepAssign } from 'locustjs-extensions-object'
 
@@ -195,6 +195,33 @@ const sortBy = function (arr, ...fns) {
 	
 	return arr.sort(sort_fn);
 }
+const contains = function (arr, ...values) {
+	let result = [];
+	
+	for (let i = 0; i < values.length; i++) {
+		if (isPrimitive(values[i])) {
+			values[i] = values[i].toString().toLowerCase();
+		}
+	}
+    
+    for (let i = 0; i < arr.length; i++) {
+        if (isPrimitive(arr[i])) {
+			for (let j = 0; j < values.length; j++) {
+				if (arr[i].toString().toLowerCase() == values[j] ) {
+					result.push(true);
+				}
+			}
+		} else {
+			for (let j = 0; j < values.length; j++) {
+				if (equals(arr[i], values[j])) {
+					result.push(true);
+				}
+			}
+		}
+    }
+    
+    return result.length == values.length;
+}
 
 function configureArrayExtensions(options) {
 	const _options = configureOptions(options)
@@ -237,6 +264,12 @@ function configureArrayExtensions(options) {
 	if (!Array.prototype.any || shouldExtend('any', _options)) {
 		Array.prototype.any = function (fn) {
 			return any(this, fn);
+		}
+	}
+	
+	if (!Array.prototype.contains || shouldExtend('contains', _options)) {
+		Array.prototype.contains = function (...args) {
+			return contains(this, ...args);
 		}
 	}
 	
@@ -287,5 +320,6 @@ export {
 	all,
 	any,
 	Objectify,
-	sortBy
+	sortBy,
+	contains
 }
