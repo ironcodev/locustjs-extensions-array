@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.contains = exports.sortBy = exports.Objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
+exports.contains = exports.sortBy = exports.objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
 
 var _locustjsBase = require("locustjs-base");
 
@@ -123,16 +123,67 @@ var any = function any(arr, fn) {
 
 exports.any = any;
 
-var Objectify = function Objectify(arr) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
-
+var objectify = function objectify(arr) {
+  // this method is reverse of toArray() in locustjs-extensions-object
   var result;
 
   if (!(0, _locustjsBase.isArray)(arr)) {
-    result = {};
-    result[arr.toString()] = null;
+    return arr;
+  }
+
+  if (arr.length == 0) return {};
+
+  if (arr.length == 1) {
+    result = arr[0];
+
+    if ((0, _locustjsBase.isArray)(result)) {
+      var temp = [];
+
+      var _iterator = _createForOfIteratorHelper(result),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var item = _step.value;
+          temp.push(objectify(item));
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      result = temp;
+    }
+
+    return result;
+  }
+
+  result = {};
+
+  for (var i = 0; i < arr.length; i += 2) {
+    var key = arr[i];
+    var value = i + 1 < arr.length ? arr[i + 1] : null;
+    if ((0, _locustjsBase.isArray)(value)) result[key] = objectify(value);else result[key] = value;
+  }
+
+  return result;
+};
+
+exports.objectify = objectify;
+
+var nestedJoin = function nestedJoin(arr) {
+  // this method is not complete yet. it has bugs. it is not exported.
+  var result;
+
+  if (!(0, _locustjsBase.isArray)(arr)) {
+    if (isObject(arr)) {
+      result = arr;
+    } else {
+      result = {};
+      result[""] = arr;
+    }
+
     return result;
   }
 
@@ -140,7 +191,14 @@ var Objectify = function Objectify(arr) {
 
   if (arr.length == 1) {
     result = {};
-    result[arr[0].toString()] = null;
+
+    if (isObject(arr[0])) {
+      result = arr[0];
+    } else {
+      result = {};
+      result[""] = arr[0];
+    }
+
     return result;
   }
 
@@ -153,12 +211,12 @@ var Objectify = function Objectify(arr) {
     }
 
     if ((0, _locustjsBase.isArray)(key)) {
-      var temp1 = key.Objectify();
+      var temp1 = nestedJoin(key);
       var temp2 = void 0;
       var temp = {};
 
       if (value) {
-        if ((0, _locustjsBase.isArray)(value)) temp2 = value.Objectify();else temp2 = value;
+        if ((0, _locustjsBase.isArray)(value)) temp2 = nestedJoin(value);else temp2 = value;
       }
 
       if (!(0, _locustjsBase.isArray)(temp1)) {
@@ -180,7 +238,7 @@ var Objectify = function Objectify(arr) {
         (0, _locustjsExtensionsObject.deepAssign)(result, temp2);
       }
     } else {
-      if ((0, _locustjsBase.isArray)(value)) result[key] = value.Objectify();else result[key] = value;
+      if ((0, _locustjsBase.isArray)(value)) result[key] = nestedJoin(value);else result[key] = value;
     }
   }
 
@@ -190,8 +248,6 @@ var Objectify = function Objectify(arr) {
 
   return result;
 };
-
-exports.Objectify = Objectify;
 
 var sortBy = function sortBy(arr) {
   for (var _len = arguments.length, fns = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -205,12 +261,12 @@ var sortBy = function sortBy(arr) {
   var sort_fn = function sort_fn(a, b) {
     var result = 0;
 
-    var _iterator = _createForOfIteratorHelper(fns),
-        _step;
+    var _iterator2 = _createForOfIteratorHelper(fns),
+        _step2;
 
     try {
-      for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var fn = _step.value;
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+        var fn = _step2.value;
         var fn_a = fn(a);
         var fn_b = fn(b);
 
@@ -225,9 +281,9 @@ var sortBy = function sortBy(arr) {
         }
       }
     } catch (err) {
-      _iterator.e(err);
+      _iterator2.e(err);
     } finally {
-      _iterator.f();
+      _iterator2.f();
     }
 
     return result;
@@ -326,8 +382,14 @@ function configureArrayExtensions(options) {
     };
   }
 
-  if (!Array.prototype.Objectify || (0, _locustjsExtensionsOptions.shouldExtend)('Objectify', _options)) {
-    /*	this method has close relation with String.prototype.nestedSplit in locustjs-extensions-string
+  if (!Array.prototype.objectify || (0, _locustjsExtensionsOptions.shouldExtend)('objectify', _options)) {
+    Array.prototype.objectify = function () {
+      return objectify(this);
+    };
+  }
+
+  if (!Array.prototype.nestedJoin || (0, _locustjsExtensionsOptions.shouldExtend)('nestedJoin', _options)) {
+    /*	this method has close relation with nestedSplit in locustjs-extensions-string
     	examples
     	input:
     	[
@@ -351,15 +413,19 @@ function configureArrayExtensions(options) {
     			{ "b": "saeed", "c": true}
     		]
     */
-    Array.prototype.Objectify = function () {
-      return Objectify(this);
+    Array.prototype.nestedJoin = function () {
+      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      return nestedJoin.apply(void 0, [this].concat(args));
     };
   }
 
   if (!Array.prototype.sortBy || (0, _locustjsExtensionsOptions.shouldExtend)('sortBy', _options)) {
     Array.prototype.sortBy = function () {
-      for (var _len4 = arguments.length, fns = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        fns[_key4] = arguments[_key4];
+      for (var _len5 = arguments.length, fns = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        fns[_key5] = arguments[_key5];
       }
 
       return sortBy.apply(void 0, [this].concat(fns));

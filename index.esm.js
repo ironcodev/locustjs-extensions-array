@@ -90,16 +90,54 @@ const any = function (arr, fn) {
 	
 	return result;
 }
-const Objectify = function (arr) {
-	if (!isArray(arr)) {
-		throw `expected array but received ${typeof arr}`
-	}
-	
+const objectify = function (arr) {	// this method is reverse of toArray() in locustjs-extensions-object
 	let result;
 	
 	if (!isArray(arr)) {
-		result = {};
-		result[arr.toString()] = null;
+		return arr;
+	}
+	if (arr.length == 0)
+		return {};
+	if (arr.length == 1) {
+		result = arr[0];
+		
+		if (isArray(result)) {
+			let temp = []
+			
+			for (let item of result) {
+				temp.push(objectify(item));
+			}
+			
+			result = temp;
+		}
+		
+		return result;
+	}
+	
+	result = {};
+	
+	for (let i = 0; i < arr.length; i += 2) {
+		let key = arr[i];
+		let value = (i + 1 < arr.length) ? arr[i + 1]: null;
+
+		if (isArray(value))
+			result[key] = objectify(value);
+		else
+			result[key] = value;
+	}
+	
+	return result;
+}
+const nestedJoin = function (arr) {	// this method is not complete yet. it has bugs. it is not exported.
+	let result;
+	
+	if (!isArray(arr)) {
+		if (isObject(arr)) {
+			result = arr;
+		} else {
+			result = {};
+			result[""] = arr;
+		}
 		
 		return result;
 	}
@@ -107,7 +145,13 @@ const Objectify = function (arr) {
 		return null;
 	if (arr.length == 1) {
 		result = {};
-		result[arr[0].toString()] = null;
+		
+		if (isObject(arr[0])) {
+			result = arr[0];
+		} else {
+			result = {};
+			result[""] = arr[0];
+		}
 		
 		return result;
 	}
@@ -121,13 +165,13 @@ const Objectify = function (arr) {
 		}
 		
 		if (isArray(key)) {
-			let temp1 = key.Objectify();
+			let temp1 = nestedJoin(key);
 			let temp2;
 			let temp = {};
 			
 			if (value) {
 				if (isArray(value))
-					temp2 = value.Objectify();
+					temp2 = nestedJoin(value);
 				else
 					temp2 = value;
 			}
@@ -135,8 +179,7 @@ const Objectify = function (arr) {
 			if (!isArray(temp1)) {
 				temp = deepAssign(temp, temp1, temp2);
 				
-				if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? 
-Object.keys(temp2).length: 0)) {
+				if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? Object.keys(temp2).length: 0)) {
 					if (isArray(result)) {
 						result = temp;
 						continue;
@@ -155,7 +198,7 @@ Object.keys(temp2).length: 0)) {
 			}
 		} else {
 			if (isArray(value))
-				result[key] = value.Objectify();
+				result[key] = nestedJoin(value);
 			else
 				result[key] = value;
 		}
@@ -273,8 +316,14 @@ function configureArrayExtensions(options) {
 		}
 	}
 	
-	if (!Array.prototype.Objectify || shouldExtend('Objectify', _options)) {
-		/*	this method has close relation with String.prototype.nestedSplit in locustjs-extensions-string
+	if (!Array.prototype.objectify || shouldExtend('objectify', _options)) {
+		Array.prototype.objectify = function () {
+			return objectify(this);
+		}
+	}
+	
+	if (!Array.prototype.nestedJoin || shouldExtend('nestedJoin', _options)) {
+		/*	this method has close relation with nestedSplit in locustjs-extensions-string
 			examples
 			input:
 			[
@@ -299,8 +348,8 @@ function configureArrayExtensions(options) {
 				]
 		*/
 		
-		Array.prototype.Objectify = function () {
-			return Objectify(this);
+		Array.prototype.nestedJoin = function (...args) {
+			return nestedJoin(this, ...args);
 		}
 	}
 	
@@ -319,7 +368,8 @@ export {
 	removeAt,
 	all,
 	any,
-	Objectify,
+	objectify,
+	//nestedJoin,
 	sortBy,
 	contains
 }
