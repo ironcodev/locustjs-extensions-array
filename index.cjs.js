@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.contains = exports.sortBy = exports.objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports.default = void 0;
+exports.max = exports.min = exports.contains = exports.sortBy = exports.objectify = exports.any = exports.all = exports.removeAt = exports.insertAt = exports.range = exports.shuffle = exports[
+  "default"
+] = void 0;
 
 var _locustjsBase = require("locustjs-base");
 
@@ -11,22 +13,107 @@ var _locustjsExtensionsOptions = require("locustjs-extensions-options");
 
 var _locustjsExtensionsObject = require("locustjs-extensions-object");
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (
+      Array.isArray(o) ||
+      (it = _unsupportedIterableToArray(o)) ||
+      (allowArrayLike && o && typeof o.length === "number")
+    ) {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return { done: true };
+          return { done: false, value: o[i++] };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError(
+      "Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."
+    );
+  }
+  var normalCompletion = true,
+    didErr = false,
+    err;
+  return {
+    s: function s() {
+      it = o[Symbol.iterator]();
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it["return"] != null) it["return"]();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
+    return _arrayLikeToArray(o, minLen);
+}
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function _typeof(obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function _typeof(obj) {
+      return obj &&
+        typeof Symbol === "function" &&
+        obj.constructor === Symbol &&
+        obj !== Symbol.prototype
+        ? "symbol"
+        : typeof obj;
+    };
+  }
+  return _typeof(obj);
+}
+
+var throwArrayExpectedException = function throwArrayExpectedException(x) {
+  if (!(0, _locustjsBase.isArray)(x)) {
+    throw "Array expected but received ".concat(_typeof(x), ".");
+  }
+};
 
 var shuffle = function shuffle(arr) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected an array";
-  }
-
+  throwArrayExpectedException(arr);
   var currentIndex = arr.length,
-      temporaryValue,
-      randomIndex; // While there remain elements to shuffle...
+    temporaryValue,
+    randomIndex; // While there remain elements to shuffle...
 
   while (0 !== currentIndex) {
     // Pick a remaining element...
@@ -58,32 +145,24 @@ var range = function range(from, to) {
 exports.range = range;
 
 var insertAt = function insertAt(arr, index, item) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
-
+  throwArrayExpectedException(arr);
   return arr.splice(index, 0, item);
 };
 
 exports.insertAt = insertAt;
 
 var removeAt = function removeAt(arr, index) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
-
+  throwArrayExpectedException(arr);
   return arr.splice(index, 1)[0];
 };
 
 exports.removeAt = removeAt;
 
 var all = function all(arr, fn) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
+  throwArrayExpectedException(arr);
 
   if (!(0, _locustjsBase.isFunction)(fn)) {
-    throw 'no callback function is given or the argument is not a function';
+    throw "no callback function is given or the argument is not a function";
   }
 
   var result = true;
@@ -101,12 +180,10 @@ var all = function all(arr, fn) {
 exports.all = all;
 
 var any = function any(arr, fn) {
-  if (!(0, _locustjsBase.isArray)(arr)) {
-    throw "expected array but received ".concat(_typeof(arr));
-  }
+  throwArrayExpectedException(arr);
 
   if (!(0, _locustjsBase.isFunction)(fn)) {
-    throw 'no function is given or the argument is not a function';
+    throw "no function is given or the argument is not a function";
   }
 
   var result = false;
@@ -140,10 +217,10 @@ var objectify = function objectify(arr) {
       var temp = [];
 
       var _iterator = _createForOfIteratorHelper(result),
-          _step;
+        _step;
 
       try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
           var item = _step.value;
           temp.push(objectify(item));
         }
@@ -164,7 +241,8 @@ var objectify = function objectify(arr) {
   for (var i = 0; i < arr.length; i += 2) {
     var key = arr[i];
     var value = i + 1 < arr.length ? arr[i + 1] : null;
-    if ((0, _locustjsBase.isArray)(value)) result[key] = objectify(value);else result[key] = value;
+    if ((0, _locustjsBase.isArray)(value)) result[key] = objectify(value);
+    else result[key] = value;
   }
 
   return result;
@@ -216,13 +294,18 @@ var nestedJoin = function nestedJoin(arr) {
       var temp = {};
 
       if (value) {
-        if ((0, _locustjsBase.isArray)(value)) temp2 = nestedJoin(value);else temp2 = value;
+        if ((0, _locustjsBase.isArray)(value)) temp2 = nestedJoin(value);
+        else temp2 = value;
       }
 
       if (!(0, _locustjsBase.isArray)(temp1)) {
         temp = (0, _locustjsExtensionsObject.deepAssign)(temp, temp1, temp2);
 
-        if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? Object.keys(temp2).length : 0)) {
+        if (
+          Object.keys(temp).length ==
+          (temp1 ? Object.keys(temp1).length : 0) +
+            (temp2 ? Object.keys(temp2).length : 0)
+        ) {
           if ((0, _locustjsBase.isArray)(result)) {
             result = temp;
             continue;
@@ -238,7 +321,8 @@ var nestedJoin = function nestedJoin(arr) {
         (0, _locustjsExtensionsObject.deepAssign)(result, temp2);
       }
     } else {
-      if ((0, _locustjsBase.isArray)(value)) result[key] = nestedJoin(value);else result[key] = value;
+      if ((0, _locustjsBase.isArray)(value)) result[key] = nestedJoin(value);
+      else result[key] = value;
     }
   }
 
@@ -250,9 +334,17 @@ var nestedJoin = function nestedJoin(arr) {
 };
 
 var sortBy = function sortBy(arr) {
-  for (var _len = arguments.length, fns = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+  for (
+    var _len = arguments.length,
+      fns = new Array(_len > 1 ? _len - 1 : 0),
+      _key = 1;
+    _key < _len;
+    _key++
+  ) {
     fns[_key - 1] = arguments[_key];
   }
+
+  throwArrayExpectedException(arr);
 
   if (fns.length == 0) {
     throw "please specify sortBy function";
@@ -262,10 +354,10 @@ var sortBy = function sortBy(arr) {
     var result = 0;
 
     var _iterator2 = _createForOfIteratorHelper(fns),
-        _step2;
+      _step2;
 
     try {
-      for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      for (_iterator2.s(); !(_step2 = _iterator2.n()).done; ) {
         var fn = _step2.value;
         var fn_a = fn(a);
         var fn_b = fn(b);
@@ -295,9 +387,16 @@ var sortBy = function sortBy(arr) {
 exports.sortBy = sortBy;
 
 var contains = function contains(arr) {
+  throwArrayExpectedException(arr);
   var result = [];
 
-  for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+  for (
+    var _len2 = arguments.length,
+      values = new Array(_len2 > 1 ? _len2 - 1 : 0),
+      _key2 = 1;
+    _key2 < _len2;
+    _key2++
+  ) {
     values[_key2 - 1] = arguments[_key2];
   }
 
@@ -328,53 +427,124 @@ var contains = function contains(arr) {
 
 exports.contains = contains;
 
+var min = function min(arr, mapper) {
+  throwArrayExpectedException(arr);
+
+  if (!(0, _locustjsBase.isFunction)(mapper)) {
+    throw "no mapping function is given or the argument is not a function";
+  }
+
+  var result = Infinity;
+
+  for (var i = 0; i < arr.length; i++) {
+    var item = (0, _locustjsBase.isFunction)(mapper) ? mapper(arr[i]) : arr[i];
+
+    if (item < result) {
+      result = item;
+    }
+  }
+
+  return result;
+};
+
+exports.min = min;
+
+var max = function max(arr, mapper) {
+  throwArrayExpectedException(arr);
+
+  if (!(0, _locustjsBase.isFunction)(mapper)) {
+    throw "no mapping function is given or the argument is not a function";
+  }
+
+  var result = -Infinity;
+
+  for (var i = 0; i < arr.length; i++) {
+    var item = (0, _locustjsBase.isFunction)(mapper) ? mapper(arr[i]) : arr[i];
+
+    if (item > result) {
+      result = item;
+    }
+  }
+
+  return result;
+};
+
+exports.max = max;
+
 function configureArrayExtensions(options) {
   var _options = (0, _locustjsExtensionsOptions.configureOptions)(options);
 
-  if (!Array.prototype.clone || (0, _locustjsExtensionsOptions.shouldExtend)('clone', _options)) {
+  if (
+    !Array.prototype.clone ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("clone", _options)
+  ) {
     Array.prototype.clone = function () {
       return this.slice(0);
     };
   } // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 
-
-  if (!Array.prototype.shuffle || (0, _locustjsExtensionsOptions.shouldExtend)('shuffle', _options)) {
+  if (
+    !Array.prototype.shuffle ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("shuffle", _options)
+  ) {
     Array.prototype.shuffle = function () {
       return shuffle(this);
     };
   }
 
-  if (!Array.prototype.insertAt || (0, _locustjsExtensionsOptions.shouldExtend)('insertAt', _options)) {
+  if (
+    !Array.prototype.insertAt ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("insertAt", _options)
+  ) {
     Array.prototype.insertAt = function (index, item) {
       return insertAt(this, index, item);
     };
   }
 
-  if (!Array.prototype.removeAt || (0, _locustjsExtensionsOptions.shouldExtend)('removeAt', _options)) {
+  if (
+    !Array.prototype.removeAt ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("removeAt", _options)
+  ) {
     Array.prototype.removeAt = function (index) {
       return removeAt(this, index);
     };
   }
 
-  if (!Array.range || (0, _locustjsExtensionsOptions.shouldExtend)('range', _options)) {
+  if (
+    !Array.range ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("range", _options)
+  ) {
     Array.range = range;
   }
 
-  if (!Array.prototype.all || (0, _locustjsExtensionsOptions.shouldExtend)('all', _options)) {
+  if (
+    !Array.prototype.all ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("all", _options)
+  ) {
     Array.prototype.all = function (fn) {
       return all(this, fn);
     };
   }
 
-  if (!Array.prototype.any || (0, _locustjsExtensionsOptions.shouldExtend)('any', _options)) {
+  if (
+    !Array.prototype.any ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("any", _options)
+  ) {
     Array.prototype.any = function (fn) {
       return any(this, fn);
     };
   }
 
-  if (!Array.prototype.contains || (0, _locustjsExtensionsOptions.shouldExtend)('contains', _options)) {
+  if (
+    !Array.prototype.contains ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("contains", _options)
+  ) {
     Array.prototype.contains = function () {
-      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      for (
+        var _len3 = arguments.length, args = new Array(_len3), _key3 = 0;
+        _key3 < _len3;
+        _key3++
+      ) {
         args[_key3] = arguments[_key3];
       }
 
@@ -382,13 +552,19 @@ function configureArrayExtensions(options) {
     };
   }
 
-  if (!Array.prototype.objectify || (0, _locustjsExtensionsOptions.shouldExtend)('objectify', _options)) {
+  if (
+    !Array.prototype.objectify ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("objectify", _options)
+  ) {
     Array.prototype.objectify = function () {
       return objectify(this);
     };
   }
 
-  if (!Array.prototype.nestedJoin || (0, _locustjsExtensionsOptions.shouldExtend)('nestedJoin', _options)) {
+  if (
+    !Array.prototype.nestedJoin ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("nestedJoin", _options)
+  ) {
     /*	this method has close relation with nestedSplit in locustjs-extensions-string
     	examples
     	input:
@@ -414,7 +590,11 @@ function configureArrayExtensions(options) {
     		]
     */
     Array.prototype.nestedJoin = function () {
-      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      for (
+        var _len4 = arguments.length, args = new Array(_len4), _key4 = 0;
+        _key4 < _len4;
+        _key4++
+      ) {
         args[_key4] = arguments[_key4];
       }
 
@@ -422,16 +602,41 @@ function configureArrayExtensions(options) {
     };
   }
 
-  if (!Array.prototype.sortBy || (0, _locustjsExtensionsOptions.shouldExtend)('sortBy', _options)) {
+  if (
+    !Array.prototype.sortBy ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("sortBy", _options)
+  ) {
     Array.prototype.sortBy = function () {
-      for (var _len5 = arguments.length, fns = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+      for (
+        var _len5 = arguments.length, fns = new Array(_len5), _key5 = 0;
+        _key5 < _len5;
+        _key5++
+      ) {
         fns[_key5] = arguments[_key5];
       }
 
       return sortBy.apply(void 0, [this].concat(fns));
     };
   }
+
+  if (
+    !Array.prototype.min ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("min", _options)
+  ) {
+    Array.prototype.min = function (mapper) {
+      return min(this, mapper);
+    };
+  }
+
+  if (
+    !Array.prototype.max ||
+    (0, _locustjsExtensionsOptions.shouldExtend)("max", _options)
+  ) {
+    Array.prototype.max = function (mapper) {
+      return max(this, mapper);
+    };
+  }
 }
 
 var _default = configureArrayExtensions;
-exports.default = _default;
+exports["default"] = _default;
