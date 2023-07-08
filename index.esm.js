@@ -1,6 +1,5 @@
-import { isArray, isFunction, isPrimitive, equals } from 'locustjs-base'
-import { configureOptions, shouldExtend } from 'locustjs-extensions-options'
-import { deepAssign } from 'locustjs-extensions-object'
+import { isArray, isFunction, isPrimitive, equals } from '@locustjs/base'
+import { merge } from '@locustjs/extensions-object'
 
 const throwArrayExpectedException = x => {
 	if (!isArray(x)) {
@@ -124,6 +123,7 @@ const objectify = function (arr) {	// this method is reverse of toArray() in loc
 
 	return result;
 }
+
 const nestedJoin = function (arr) {	// this method is not complete yet. it has bugs. it is not exported.
 	let result;
 
@@ -173,7 +173,7 @@ const nestedJoin = function (arr) {	// this method is not complete yet. it has b
 			}
 
 			if (!isArray(temp1)) {
-				temp = deepAssign(temp, temp1, temp2);
+				temp = merge(temp, temp1, temp2);
 
 				if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? Object.keys(temp2).length : 0)) {
 					if (isArray(result)) {
@@ -189,8 +189,8 @@ const nestedJoin = function (arr) {	// this method is not complete yet. it has b
 				if (temp2)
 					result.push(temp2);
 			} else {
-				deepAssign(result, temp1);
-				deepAssign(result, temp2);
+				merge(result, temp1);
+				merge(result, temp2);
 			}
 		} else {
 			if (isArray(value))
@@ -206,6 +206,7 @@ const nestedJoin = function (arr) {	// this method is not complete yet. it has b
 
 	return result;
 }
+
 const sortBy = function (arr, ...fns) {
 	throwArrayExpectedException(arr);
 
@@ -236,6 +237,7 @@ const sortBy = function (arr, ...fns) {
 
 	return arr.sort(sort_fn);
 }
+
 const contains = function (arr, ...values) {
 	throwArrayExpectedException(arr);
 
@@ -306,110 +308,174 @@ const max = function (arr, mapper) {
 	return result;
 }
 
-function configureArrayExtensions(options) {
-	const _options = configureOptions(options)
+function toObjectKeyValue(arr) {
+	let result = {}
 
-	if (!Array.prototype.clone || shouldExtend('clone', _options)) {
-		Array.prototype.clone = function () {
-			return this.slice(0);
+	for (let item of arr) {
+		if (isArray(item) && item.length == 2) {
+			if (isArray(item[1])) {
+				result[item[0]] = toObjectKeyValue(item[1]);
+			} else {
+				result[item[0]] = item[1];
+			}
 		}
 	}
+
+	return result;
+}
+
+function toObjectSchema(arr) {
+	let result = {}
+
+	for (let item of arr) {
+		if (isArray(item)) {
+			if (item.length == 2 && isArray(item[1])) {
+				result[item[0]] = toObjectSchema(item[1]);
+			}
+		} else {
+			result[item] = undefined;
+		}
+	}
+
+	return result;
+}
+
+function toObjectValues(arr, schema) {
+	let result = {}
+
+	if (isArray(arr) && isArray(schema) && arr.length == schema.length) {
+		for (let i = 0; i < schema.length; i++) {
+			const key = schema[i];
+
+			if (isArray(key)) {
+				if (key.length == 2 && isArray(key[1])) {
+					result[key[0]] = toObjectValues(arr[i], key[1]);
+				}
+			} else {
+				result[key] = arr[i];
+			}
+		}
+	}
+
+	return result;
+}
+
+function toObject(arr, type, schema) {
+	let result;
+
+	if (isArray(arr)) {
+		if (arr.length == 1) {
+			result = arr[0]
+		} else {
+			switch (type) {
+				case 'keyvalue':
+				case 'key/value':
+				case 'key-value':
+					result = toObjectKeyValue(arr);
+
+					break;
+				case 'values':
+					result = toObjectValues(arr, schema);
+
+					break;
+				case 'keys':
+				case 'schema':
+					result = toObjectSchema(arr);
+
+					break;
+			}
+		}
+	} else {
+		result = arr;
+	}
+
+	return result;
+}
+
+function configureArrayExtensions(options) {
+	const eh = new ExtensionHelper(options, console);
+	
+	eh.extend(Array, 'clone', function () {
+		return this.slice(0);
+	});
 
 	// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-	if (!Array.prototype.shuffle || shouldExtend('shuffle', _options)) {
-		Array.prototype.shuffle = function () {
-			return shuffle(this);
-		}
-	}
+	eh.extend(Array, 'shuffle', function () {
+		return shuffle(this);
+	});
 
-	if (!Array.prototype.insertAt || shouldExtend('insertAt', _options)) {
-		Array.prototype.insertAt = function (index, item) {
-			return insertAt(this, index, item);
-		}
-	}
+	eh.extend(Array, 'insertAt', function (index, item) {
+		return insertAt(this, index, item);
+	});
+	
+	eh.extend(Array, 'removeAt', function (index) {
+		return removeAt(this, index);
+	});
 
-	if (!Array.prototype.removeAt || shouldExtend('removeAt', _options)) {
-		Array.prototype.removeAt = function (index) {
-			return removeAt(this, index);
-		}
-	}
-
-	if (!Array.range || shouldExtend('range', _options)) {
+	if (Array.range === undefined || eh.shouldExtend('range')) {
 		Array.range = range;
 	}
 
-	if (!Array.prototype.all || shouldExtend('all', _options)) {
-		Array.prototype.all = function (fn) {
-			return all(this, fn);
-		}
-	}
+	eh.extend(Array, 'all', function (fn) {
+		return all(this, fn);
+	});
 
-	if (!Array.prototype.any || shouldExtend('any', _options)) {
-		Array.prototype.any = function (fn) {
-			return any(this, fn);
-		}
-	}
+	eh.extend(Array, 'any', function (fn) {
+		return any(this, fn);
+	});
 
-	if (!Array.prototype.contains || shouldExtend('contains', _options)) {
-		Array.prototype.contains = function (...args) {
-			return contains(this, ...args);
-		}
-	}
+	eh.extend(Array, 'contains', function (...args) {
+		return contains(this, ...args);
+	});
 
-	if (!Array.prototype.objectify || shouldExtend('objectify', _options)) {
-		Array.prototype.objectify = function () {
-			return objectify(this);
-		}
-	}
-
-	if (!Array.prototype.nestedJoin || shouldExtend('nestedJoin', _options)) {
-		/*	this method has close relation with nestedSplit in locustjs-extensions-string
-			examples
-			input:
+	eh.extend(Array, 'objectify', function () {
+		return objectify(this);
+	});
+	
+	/*	this method has close relation with nestedSplit in @locustjs/extensions-string
+		examples
+		input:
+		[
+			["a", 1],
+			["b", "ali"]
+		]
+		output: { "a": 1, "b": "ali" }
+		
+		input:
 			[
-				["a", 1],
-				["b", "ali"]
+				[ ["a",1],["b", "ali"] ],
+				[ ["a",2],["b", "reza"],["c", true] ],
+				[ ["a",3],["b"],["c", false] ],
+				[ ["b", "saeed"],["c", true] ]
 			]
-			output: { "a": 1, "b": "ali" }
-			
-			input:
-				[
-					[ ["a",1],["b", "ali"] ],
-					[ ["a",2],["b", "reza"],["c", true] ],
-					[ ["a",3],["b"],["c", false] ],
-					[ ["b", "saeed"],["c", true] ]
-				]
-			output:
-				[
-					{ "a": 1, "b": "ali" },
-					{ "a": 2, "b": "reza" , "c": true },
-					{ "a": 3, "b": null, "c": false },
-					{ "b": "saeed", "c": true}
-				]
-		*/
+		output:
+			[
+				{ "a": 1, "b": "ali" },
+				{ "a": 2, "b": "reza" , "c": true },
+				{ "a": 3, "b": null, "c": false },
+				{ "b": "saeed", "c": true}
+			]
+	*/
 
-		Array.prototype.nestedJoin = function (...args) {
-			return nestedJoin(this, ...args);
-		}
-	}
+	// eh.extend(Array, 'nestedJoin', function (...args) {
+	// 	return nestedJoin(this, ...args);
+	// });
 
-	if (!Array.prototype.sortBy || shouldExtend('sortBy', _options)) {
-		Array.prototype.sortBy = function (...fns) {
-			return sortBy(this, ...fns);
-		}
-	}
+	eh.extend(Array, 'sortBy', function (...fns) {
+		return sortBy(this, ...fns);
+	});
 
-	if (!Array.prototype.min || shouldExtend('min', _options)) {
-		Array.prototype.min = function (mapper) {
-			return min(this, mapper);
-		}
-	}
+	eh.extend(Array, 'min', function (mapper) {
+		return min(this, mapper);
+	});
 
-	if (!Array.prototype.max || shouldExtend('max', _options)) {
-		Array.prototype.max = function (mapper) {
-			return max(this, mapper);
-		}
-	}
+	eh.extend(Array, 'max', function (mapper) {
+		return max(this, mapper);
+	});
+
+	eh.extend(Object, 'toObject', function (type, schema) {
+		return toObject(this, type, schema)
+	});
 }
 
 export default configureArrayExtensions;
@@ -425,5 +491,6 @@ export {
 	sortBy,
 	contains,
 	min,
-	max
+	max,
+	toObject
 }

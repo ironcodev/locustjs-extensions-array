@@ -1,21 +1,21 @@
-# locustjs-extensions-array
+# About
 This library contains extensions for Array.
 
 # Install
 ```
-npm i locustjs-extensions-array
+npm i @locustjs/extensions-array
 ```
 
 # Usage
 
 CommonJs
 ```javascript
-var someFn = require('locustjs-extensions-array').someFn;
+var someFn = require('@locustjs/extensions-array').someFn;
 ```
 
 ES6
 ```javascript
-import { someFn } from 'locustjs-extensions-array'
+import { someFn } from '@locustjs/extensions-array'
 ```
 
 # Functions
@@ -159,3 +159,101 @@ console.log(contains(arr, 23, 30, 400));   // false
 ```
 
 
+## `toObject(arr, type, schema?)`
+This method carries out reverse of `toArray`. It converts an array to an object. The result depends on `type`. Possible values are as follows:
+
+- `key-value`: converts an array of key/value items into an object, where each key/value is an array with 2 items, the first item is key, the second is value.
+- `values`: converts an array of values into an object. `schema` parameter is obligatory in this type. `schema` can be generated using `toArray` with `keys` or `schema` value.
+- `keys` or `schema`: converts an array into an object whose properties are all `undefined`.
+
+`toObject` is similar to `Object.fromEntries()`. It performs a recursive/nested invokation on array items.
+
+Example:
+```javascript
+let arr, x;
+
+arr = [
+	["name", "John"],
+	[
+		"address",
+		[
+			[
+				"city",
+				[
+					["id", 10],
+					["name", "Tehran"]
+				]
+			],
+			["zip", "12345678"]
+		]
+	],
+	["age", 23]
+];
+
+// ==== type: key-value =====
+// call directly
+x = toObject(arr, `key-value`);
+console.log(x);
+// as an extension method
+x = arr.toObject(`key-value`);
+console.log(x);
+/*
+{
+    name: 'John',
+    address: {
+        city: { id: 10, name: 'Tehran' },
+        zip: '12345678'
+    },
+    age: 23
+}
+*/
+
+// ==== type: values =====
+
+arr = [
+    "ali",
+	[
+        [10, "Tehran"],
+		"123456789"
+	],
+	23
+];
+const schema = x.toArray('schema');
+
+// call directly
+x = toObject(arr, 'values', schema);
+console.log(x);
+// as an extension method
+x = arr.toObject('values', schema);
+console.log(x);
+/*
+{
+    name: 'John',
+    address: {
+        city: { id: 10, name: 'Tehran' },
+        zip: '12345678'
+    },
+    age: 23
+}
+*/
+
+// ==== type: schema =====
+// call directly
+x = toObject(arr, 'schema');
+console.log(x);
+// as an extension method
+x = arr.toObject('schema');
+console.log(x);
+/*
+{
+    name: undefined,
+    address: {
+        city: { id: undefined, name: undefined },
+        zip: undefined
+    },
+    age: undefined
+}
+*/
+```
+
+This function carries out reverse of `toArray()` extension method in [`@locustjs/extensions-object`](https://github.com/ironcodev/locustjs-extensions-object).
