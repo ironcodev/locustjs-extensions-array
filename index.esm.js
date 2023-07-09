@@ -85,44 +85,6 @@ const any = function (arr, fn) {
 
 	return result;
 }
-const objectify = function (arr) {	// this method is reverse of toArray() in locustjs-extensions-object
-	let result;
-
-	if (!isArray(arr)) {
-		return arr;
-	}
-	if (arr.length == 0)
-		return {};
-	if (arr.length == 1) {
-		result = arr[0];
-
-		if (isArray(result)) {
-			let temp = []
-
-			for (let item of result) {
-				temp.push(objectify(item));
-			}
-
-			result = temp;
-		}
-
-		return result;
-	}
-
-	result = {};
-
-	for (let i = 0; i < arr.length; i += 2) {
-		let key = arr[i];
-		let value = (i + 1 < arr.length) ? arr[i + 1] : null;
-
-		if (isArray(value))
-			result[key] = objectify(value);
-		else
-			result[key] = value;
-	}
-
-	return result;
-}
 
 const nestedJoin = function (arr) {	// this method is not complete yet. it has bugs. it is not exported.
 	let result;
@@ -391,6 +353,8 @@ function toObject(arr, type, schema) {
 
 	return result;
 }
+
+const objectify = (arr) => toObject(arr, 'key-value');
 
 function configureArrayExtensions(options) {
 	const eh = new ExtensionHelper(options, console);
