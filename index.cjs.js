@@ -69,67 +69,17 @@ const any = function (arr, fn) {
   }
   return result;
 };
-const nestedJoin = function (arr) {
-  // this method is not complete yet. it has bugs. it is not exported.
-  let result;
-  if (!isArray(arr)) {
-    if (isObject(arr)) {
-      result = arr;
+function joins(arr, delimiters) {
+  let result = [];
+  for (let item of arr) {
+    if (isArray(item)) {
+      result.push(joins(item, delimiters.slice(1)));
     } else {
-      result = {};
-      result[""] = arr;
-    }
-    return result;
-  }
-  if (arr.length == 0) return null;
-  if (arr.length == 1) {
-    result = {};
-    if (isObject(arr[0])) {
-      result = arr[0];
-    } else {
-      result = {};
-      result[""] = arr[0];
-    }
-    return result;
-  }
-  for (let i = 0; i < arr.length; i += 2) {
-    let key = arr[i];
-    let value = i + 1 < arr.length ? arr[i + 1] : null;
-    if (i == 0) {
-      result = isArray(key) ? [] : {};
-    }
-    if (isArray(key)) {
-      let temp1 = nestedJoin(key);
-      let temp2;
-      let temp = {};
-      if (value) {
-        if (isArray(value)) temp2 = nestedJoin(value);else temp2 = value;
-      }
-      if (!isArray(temp1)) {
-        temp = merge(temp, temp1, temp2);
-        if (Object.keys(temp).length == (temp1 ? Object.keys(temp1).length : 0) + (temp2 ? Object.keys(temp2).length : 0)) {
-          if (isArray(result)) {
-            result = temp;
-            continue;
-          }
-        }
-      }
-      if (isArray(result)) {
-        result.push(temp1);
-        if (temp2) result.push(temp2);
-      } else {
-        merge(result, temp1);
-        merge(result, temp2);
-      }
-    } else {
-      if (isArray(value)) result[key] = nestedJoin(value);else result[key] = value;
+      result.push(item);
     }
   }
-  if (isArray(result) && result.length == 1) {
-    result = result[0];
-  }
-  return result;
-};
+  return result.join(delimiters[0]);
+}
 const sortBy = function (arr, ...fns) {
   throwArrayExpectedException(arr);
   if (fns.length == 0) {
@@ -307,35 +257,28 @@ function configureArrayExtensions(options) {
     return objectify(this);
   });
 
-  /*	this method has close relation with nestedSplit in @locustjs/extensions-string
-  	examples
-  	input:
-  	[
+  /*	this method has close relation with splits() function in @locustjs/extensions-string
+  	examples:
+  	joins([
   		["a", 1],
   		["b", "ali"]
-  	]
-  	output: { "a": 1, "b": "ali" }
+  	], '&', '=')
+  	
+  	output: a=1&b=ali
   	
   	input:
   		[
-  			[ ["a",1],["b", "ali"] ],
-  			[ ["a",2],["b", "reza"],["c", true] ],
-  			[ ["a",3],["b"],["c", false] ],
-  			[ ["b", "saeed"],["c", true] ]
+  			[ ["a",1], ["b", "ali"] ],
+  			[ ["a",2], ["b", "reza"], ["c", true] ],
+  			[ ["a",3], ["b"], ["c", false] ],
+  			[ ["b", "saeed"], ["c", true] ]
   		]
-  	output:
-  		[
-  			{ "a": 1, "b": "ali" },
-  			{ "a": 2, "b": "reza" , "c": true },
-  			{ "a": 3, "b": null, "c": false },
-  			{ "b": "saeed", "c": true}
-  		]
+  	output: "a=1:b=ali&a=2:b=reza:c=true&a=3:b=:c=false&b=saeed:c=true"
   */
 
-  // eh.extend(Array, 'nestedJoin', function (...args) {
-  // 	return nestedJoin(this, ...args);
-  // });
-
+  eh.extend(Array, 'joins', function (...args) {
+    return joins(this, ...args);
+  });
   eh.extend(Array, 'sortBy', function (...fns) {
     return sortBy(this, ...fns);
   });
@@ -348,8 +291,17 @@ function configureArrayExtensions(options) {
   eh.extend(Object, 'toObject', function (type, schema) {
     return toObject(this, type, schema);
   });
+  /*	this method has close relation with toArray() function in @locustjs/extensions-object
+  	examples:
+  	exmaple 1: key-value
+  	input:
+  	[
+  		["a", 1],
+  		["b", "ali"]
+  	]
+  	output: { "a": 1, "b": "ali" }
+  */
 }
+
 export default configureArrayExtensions;
-export { shuffle, range, insertAt, removeAt, all, any, objectify,
-//nestedJoin,
-sortBy, contains, min, max, toObject };
+export { shuffle, range, insertAt, removeAt, all, any, objectify, joins, sortBy, contains, min, max, toObject };
