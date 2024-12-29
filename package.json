@@ -1,6 +1,6 @@
 {
   "name": "@locustjs/extensions-array",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "This library contains extensions for Array",
   "main": "index.cjs.js",
   "module": "index.esm.js",
@@ -25,7 +25,8 @@
   "homepage": "https://github.com/ironcodev/locustjs-extensions-array#readme",
   "devDependencies": {
     "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.22.7"
+    "@babel/core": "^7.22.7",
+    "@babel/preset-env": "^7.26.0"
   },
   "dependencies": {
     "@locustjs/base": "^2.1.0",
