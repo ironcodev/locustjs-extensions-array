@@ -126,7 +126,7 @@ function _unsupportedIterableToArray(r, a) {
   if (r) {
     if ("string" == typeof r) return _arrayLikeToArray(r, a);
     var t = {}.toString.call(r).slice(8, -1);
-    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : undefined;
+    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
   }
 }
 
@@ -310,6 +310,23 @@ function toObject(arr, type, schema) {
     if (arr.length == 1) {
       result = arr[0];
     } else {
+      if (base.isArray(type) && base.isNullOrUndefined(schema)) {
+        schema = type;
+        type = "values";
+      }
+      if (base.isEmpty(type)) {
+        if (arr.length == arr.filter(base.isArray).length && arr.length == arr.filter(function (x) {
+          return x.length == 2;
+        }).length) {
+          type = "keyvalue";
+        } else if (arr.length == arr.filter(function (x) {
+          return base.isString(x) || base.isArray(x);
+        }).length) {
+          type = "schema";
+        } else {
+          type = "values";
+        }
+      }
       switch (type) {
         case "keyvalue":
         case "key/value":
@@ -362,7 +379,7 @@ function configureArrayExtensions(options, logger) {
     for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
-    return contains.apply(undefined, [this].concat(args));
+    return contains.apply(void 0, [this].concat(args));
   });
   eh.extend(Array, "objectify", function () {
     return objectify(this);
@@ -391,13 +408,13 @@ function configureArrayExtensions(options, logger) {
     for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       args[_key2] = arguments[_key2];
     }
-    return joins.apply(undefined, [this].concat(args));
+    return joins.apply(void 0, [this].concat(args));
   });
   eh.extend(Array, "sortBy", function () {
     for (var _len3 = arguments.length, fns = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
       fns[_key3] = arguments[_key3];
     }
-    return sortBy.apply(undefined, [this].concat(fns));
+    return sortBy.apply(void 0, [this].concat(fns));
   });
   eh.extend(Array, "min", function (mapper) {
     return min(this, mapper);
