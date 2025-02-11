@@ -1,6 +1,11 @@
 # About
 This library contains extensions for Array.
 
+## Current Version
+```
+2.2.0
+```
+
 # Install
 ```
 npm i @locustjs/extensions-array
@@ -19,11 +24,25 @@ import { someFn } from '@locustjs/extensions-array'
 ```
 
 # Functions
+- `shuffle`
+- `range`
+- `insertAt`
+- `removeAt`
+- `all`
+- `any`
+- `objectify`
+- `joins`
+- `sortBy`
+- `contains`
+- `min`
+- `max`
+- `toObject`
+
 ## shuffle(array)
 Shuffles items of an array.
 
 ```javascript
-import { shuffle } from 'locustjs-extensions-array'
+import { shuffle } from '@locustjs/extensions-array'
 
 const source = [10, 23, 14, 9, 31];
 const shuffled = shuffle(source);
@@ -35,7 +54,7 @@ console.log(shuffled);  // e.g.: 14, 10, 31, 23, 9
 Generates an array of integer numbers starting from 'from' and ending at 'to - 1'.
 
 ```javascript
-import { range } from 'locustjs-extensions-array'
+import { range } from '@locustjs/extensions-array'
 
 const arr = range(5, 10);
 
@@ -46,9 +65,10 @@ console.log(arr);  // 5, 6, 7, 8, 9
 Inserts given item at the specified index into an array.
 
 ```javascript
-import { insertAt } from 'locustjs-extensions-array'
+import { insertAt } from '@locustjs/extensions-array'
 
 const arr = ['red', 'green'];
+
 insertAt(arr, 1, 'blue');
 
 console.log(arr);  // 'red', 'blue', 'green'
@@ -58,9 +78,10 @@ console.log(arr);  // 'red', 'blue', 'green'
 Removes item of the specified index from an array.
 
 ```javascript
-import { removeAt } from 'locustjs-extensions-array'
+import { removeAt } from '@locustjs/extensions-array'
 
 const arr = ['red', 'green', 'blue'];
+
 removeAt(arr, 1);
 
 console.log(arr);  // 'red', 'blue'
@@ -70,7 +91,7 @@ console.log(arr);  // 'red', 'blue'
 Iterates over an array and checks whether all items conform to a condition by calling a given function on each item.
 
 ```javascript
-import { all } from 'locustjs-extensions-array'
+import { all } from '@locustjs/extensions-array'
 
 const arr = [10, 20, 30, 40];
 
@@ -78,16 +99,28 @@ console.log(all(arr, x => x % 2 == 0));  // true
 console.log(all(arr, x => x < 40));  // false
 ```
 
+Signature of the `fn` callback is:
+
+```javascript
+fn(value, index, array)
+```
+
 ## any(array, fn)
 Iterates over an array and checks if at least one item conforms to a condition by calling given function on each item.
 
 ```javascript
-import { any } from 'locustjs-extensions-array'
+import { any } from '@locustjs/extensions-array'
 
 const arr = [10, 20, 30, 40];
 
 console.log(any(arr, x => x % 2 == 0));  // true
 console.log(all(arr, x => x > 40));  // false
+```
+
+Signature of the `fn` callback is:
+
+```javascript
+fn(value, index, array)
 ```
 
 ## objectify(array)
@@ -121,7 +154,7 @@ Converts an array into an object.
 Sorts an array of objects based on different properties in those objects.
 
 ```javascript
-import { sortBy } from 'locustjs-extensions-array'
+import { sortBy } from '@locustjs/extensions-array'
 
 var arr = [
 	{code: 10, parent: 1, name: 'item 1' },
@@ -149,7 +182,7 @@ for (let item of arr2) {
 Checks whether given array contains given elements.
 
 ```javascript
-import { contains } from 'locustjs-extensions-array'
+import { contains } from '@locustjs/extensions-array'
 
 var arr = [ 10, 14, 23, 9, 5, 34, 30, 18 ];
 
@@ -159,20 +192,16 @@ console.log(contains(arr, 23, 30, 400));   // false
 ```
 
 
-## `toObject(arr, type, schema?)`
-This method carries out reverse of `toArray`. It converts an array to an object. The result depends on `type`. Possible values are as follows:
+## toObject(arr, type, schema?)
+This method carries out reverse of `toArray()` method in `@locustjs/extensions-object` library. It converts an array to an object. The result depends on `type` which specifies what type of data the array contains. Possible values are:
 
-- `key-value`: converts an array of key/value items into an object, where each key/value is an array with 2 items, the first item is key, the second is value.
-- `values`: converts an array of values into an object. `schema` parameter is obligatory in this type. `schema` can be generated using `toArray` with `keys` or `schema` value.
-- `keys` or `schema`: converts an array into an object whose properties are all `undefined`.
+- `key-value`: it means that `arr` contains both `keys` and `values` (object's prop names and prop values). Each entry in the array is in turn two-elemented array (key and value), the first is the key (prop name) and the second is the value.
+- `values`: it means that `arr` only contains values (each element is the real value of a prop) and no prop names are already embeded in `arr`. Since, no keys are existed in `arr`, passing `schema` parameter is mandatory, so that `toObject()` knows how it shold construct the object. `schema` can be generated using `toArray()` extension method from `@locustjs/extensions-object` with `keys` or `schema` argument.
+- `keys` or `schema`: it means that `arr` is in fact an schema i.e. it contains only prop names and no values are in it. This time, `toObject()` constructs an object whose properties are all `undefined`.
 
-`toObject` is similar to `Object.fromEntries()`. It performs a recursive/nested invokation on array items.
-
-Example:
+Example 1: passing an array containing prop names/values
 ```javascript
-let arr, x;
-
-arr = [
+const arr = [
 	["name", "John"],
 	[
 		"address",
@@ -190,12 +219,7 @@ arr = [
 	["age", 23]
 ];
 
-// ==== type: key-value =====
-// call directly
-x = toObject(arr, `key-value`);
-console.log(x);
-// as an extension method
-x = arr.toObject(`key-value`);
+const x = toObject(arr, `key-value`); // or arr.toObject(`key-value`) as an extension method
 console.log(x);
 /*
 {
@@ -207,24 +231,21 @@ console.log(x);
     age: 23
 }
 */
+```
 
-// ==== type: values =====
-
-arr = [
-    "ali",
-	[
-        [10, "Tehran"],
-		"123456789"
-	],
-	23
+Example 2: passing an array containing values only
+```javascript
+const values = [
+    "John",
+    [
+      [10, "Tehran"],
+      "123456789"
+    ],
+    23
 ];
-const schema = x.toArray('schema');
+const schema = ["name",["address",["id", "name"]],"age"]; // or x.toArray('schema')
 
-// call directly
-x = toObject(arr, 'values', schema);
-console.log(x);
-// as an extension method
-x = arr.toObject('values', schema);
+const x = toObject(values, 'values', schema); // or values.toObject('values', schema) as an extension method
 console.log(x);
 /*
 {
@@ -236,13 +257,11 @@ console.log(x);
     age: 23
 }
 */
+```
 
-// ==== type: schema =====
-// call directly
-x = toObject(arr, 'schema');
-console.log(x);
-// as an extension method
-x = arr.toObject('schema');
+Example 3: passing an array containing prop names only
+```javascript
+const x = toObject(schema, 'schema'); // or schema.toObject('schema') as an extension method
 console.log(x);
 /*
 {
@@ -256,4 +275,36 @@ console.log(x);
 */
 ```
 
-This function carries out reverse of `toArray()` extension method in [`@locustjs/extensions-object`](https://github.com/ironcodev/locustjs-extensions-object).
+It is possible not to specify `type` parameter. In this case, `toObject()` determines `type` based on the structure of the input array.
+
+Example 4: not specifying `type`
+
+```javascript
+const arr = [
+	["name", "John"],
+	[
+		"address",
+		[
+			[
+				"city",
+				[
+					["id", 10],
+					["name", "Tehran"]
+				]
+			],
+			["zip", "12345678"]
+		]
+	],
+	["age", 23]
+];
+
+const x = arr.toObject();
+
+console.log(x);
+```
+
+There is a catch though. If the array contains only values and all of the values are string, `toObject` assumes it to be a schema. In this case, it is necessary to specying `type`.
+
+`toObject()` carries out reverse of `toArray()` extension method from [`@locustjs/extensions-object`](https://github.com/ironcodev/locustjs-extensions-object).
+
+**Note:** `toArray() / toObject()` are similar to `Object.entries() / Object.fromEntries()`. The difference and the benefit is that they perform recursively and produce a more condensced data, whereas `Object.entres()/fromEntries()` do not act recursively (they operate only on the first level).

@@ -1,12 +1,12 @@
 {
   "name": "@locustjs/extensions-array",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "This library contains extensions for Array",
-  "main": "index.cjs.js",
-  "module": "index.esm.js",
+  "main": "dist/index.js",
+  "module": "src/index.js",
   "scripts": {
-    "build": "babel index.esm.js -o index.cjs.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c",
+    "test": "node -r esm ./tests/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,12 +24,15 @@
   },
   "homepage": "https://github.com/ironcodev/locustjs-extensions-array#readme",
   "devDependencies": {
-    "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.22.7"
+    "@babel/preset-env": "^7.26.0",
+    "@locustjs/test": "^2.0.1",
+    "@rollup/plugin-babel": "^6.0.4",
+    "esm": "^3.2.25",
+    "rollup": "^4.29.1"
   },
   "dependencies": {
-    "@locustjs/base": "^2.1.0",
-    "@locustjs/extensions-object": "^2.0.0",
-    "@locustjs/extensions-options": "^2.0.1"
+    "@locustjs/base": "^4.4.1",
+    "@locustjs/exception": "^2.2.0",
+    "@locustjs/extensions-options": "^2.2.2"
   }
 }
