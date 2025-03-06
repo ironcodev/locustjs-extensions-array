@@ -16,6 +16,8 @@ import test81 from "./sortBy";
 import test82 from "./Array.sortBy";
 import test91 from "./toObject";
 import test92 from "./Array.toObject";
+import test101 from "./containsAny";
+import test102 from "./Array.containsAny";
 import { TestRunner } from "@locustjs/test";
 
 const tests = [
@@ -37,6 +39,8 @@ const tests = [
   ...test82,
   ...test91,
   ...test92,
+  ...test101,
+  ...test102,
 ];
 
 TestRunner.start(tests, true);

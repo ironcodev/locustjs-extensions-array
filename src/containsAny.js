@@ -1,7 +1,7 @@
 import { throwIfNotArray } from "@locustjs/exception";
 import { isEqualityComparer, DefaultEqualityComparer } from "@locustjs/base";
 
-const contains = function (arr, ...values) {
+const containsAny = function (arr, ...values) {
   throwIfNotArray(arr, "arr");
 
   const lastValue = values.length ? values[values.length - 1] : null;
@@ -9,11 +9,11 @@ const contains = function (arr, ...values) {
   let equalityComparer = isEqualityComparer(lastValue)
     ? lastValue
     : DefaultEqualityComparer;
-  let result = true;
+  let result = false;
 
   for (let i = 0; i < values.length; i++) {
-    if (arr.findIndex((x) => equalityComparer.equals(x, values[i])) < 0) {
-      result = false;
+    if (arr.findIndex((x) => equalityComparer.equals(x, values[i])) >= 0) {
+      result = true;
       break;
     }
   }
@@ -21,4 +21,4 @@ const contains = function (arr, ...values) {
   return result;
 };
 
-export default contains;
+export default containsAny;

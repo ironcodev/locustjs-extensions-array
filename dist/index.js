@@ -35,32 +35,47 @@ var any = function any(arr, fn) {
 };
 
 var contains = function contains(arr) {
-  exception.throwIfNotArray(arr, "arr");
-  var result = [];
   for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     values[_key - 1] = arguments[_key];
   }
+  exception.throwIfNotArray(arr, "arr");
+  var lastValue = values.length ? values[values.length - 1] : null;
+  var equalityComparer = base.isEqualityComparer(lastValue) ? lastValue : base.DefaultEqualityComparer;
+  var result = true;
+  var _loop = function _loop(i) {
+    if (arr.findIndex(function (x) {
+      return equalityComparer.equals(x, values[i]);
+    }) < 0) {
+      result = false;
+      return 1; // break
+    }
+  };
   for (var i = 0; i < values.length; i++) {
-    if (base.isPrimitive(values[i])) {
-      values[i] = values[i].toString().toLowerCase();
-    }
+    if (_loop(i)) break;
   }
-  for (var _i = 0; _i < arr.length; _i++) {
-    if (base.isPrimitive(arr[_i])) {
-      for (var j = 0; j < values.length; j++) {
-        if (arr[_i].toString().toLowerCase() == values[j]) {
-          result.push(true);
-        }
-      }
-    } else {
-      for (var _j = 0; _j < values.length; _j++) {
-        if (base.equals(arr[_i], values[_j])) {
-          result.push(true);
-        }
-      }
-    }
+  return result;
+};
+
+var containsAny = function containsAny(arr) {
+  for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    values[_key - 1] = arguments[_key];
   }
-  return result.length == values.length;
+  exception.throwIfNotArray(arr, "arr");
+  var lastValue = values.length ? values[values.length - 1] : null;
+  var equalityComparer = base.isEqualityComparer(lastValue) ? lastValue : base.DefaultEqualityComparer;
+  var result = false;
+  var _loop = function _loop(i) {
+    if (arr.findIndex(function (x) {
+      return equalityComparer.equals(x, values[i]);
+    }) >= 0) {
+      result = true;
+      return 1; // break
+    }
+  };
+  for (var i = 0; i < values.length; i++) {
+    if (_loop(i)) break;
+  }
+  return result;
 };
 
 var insertAt = function insertAt(arr, index, item) {
@@ -346,12 +361,10 @@ function toObject(arr, type, schema) {
   return result;
 }
 
-var isEqualityComparer = function isEqualityComparer(x) {
-  return isObject(x) && isFunction(x.equals);
-};
 var objectify = function objectify(arr) {
   return toObject(arr, "key-value");
 };
+var containsAll = contains;
 function configureArrayExtensions(options, logger) {
   var eh = new ExtensionHelper(options, logger);
   eh.extend(Array, "clone", function () {
@@ -381,6 +394,18 @@ function configureArrayExtensions(options, logger) {
     }
     return contains.apply(void 0, [this].concat(args));
   });
+  eh.extend(Array, "containsAll", function () {
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+    return containsAll.apply(void 0, [this].concat(args));
+  });
+  eh.extend(Array, "containsAny", function () {
+    for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args[_key3] = arguments[_key3];
+    }
+    return containsAny.apply(void 0, [this].concat(args));
+  });
   eh.extend(Array, "objectify", function () {
     return objectify(this);
   });
@@ -405,14 +430,14 @@ function configureArrayExtensions(options, logger) {
   */
 
   eh.extend(Array, "joins", function () {
-    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+    for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      args[_key4] = arguments[_key4];
     }
     return joins.apply(void 0, [this].concat(args));
   });
   eh.extend(Array, "sortBy", function () {
-    for (var _len3 = arguments.length, fns = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      fns[_key3] = arguments[_key3];
+    for (var _len5 = arguments.length, fns = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+      fns[_key5] = arguments[_key5];
     }
     return sortBy.apply(void 0, [this].concat(fns));
   });
@@ -441,7 +466,7 @@ function configureArrayExtensions(options, logger) {
       return _array_find.call(this, arg, thisArg);
     }
     return _array_find(function (x) {
-      return isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
+      return base.isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
     }, thisArg);
   });
   var _array_findIndex = Array.prototype.findIndex;
@@ -450,7 +475,7 @@ function configureArrayExtensions(options, logger) {
       return _array_findIndex.call(this, arg, thisArg);
     }
     return _array_findIndex(function (x) {
-      return isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
+      return base.isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
     }, thisArg);
   });
 }
@@ -459,6 +484,8 @@ exports.all = all;
 exports.any = any;
 exports.configureArrayExtensions = configureArrayExtensions;
 exports.contains = contains;
+exports.containsAll = containsAll;
+exports.containsAny = containsAny;
 exports.insertAt = insertAt;
 exports.joins = joins;
 exports.max = max;

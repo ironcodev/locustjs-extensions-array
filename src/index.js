@@ -2,6 +2,7 @@ import ExtensionHelper from "@locustjs/extensions-options";
 import all from "./all";
 import any from "./any";
 import contains from "./contains";
+import containsAny from "./containsAny";
 import insertAt from "./insertAt";
 import joins from "./joins";
 import max from "./max";
@@ -11,9 +12,10 @@ import removeAt from "./removeAt";
 import shuffle from "./shuffle";
 import sortBy from "./sortBy";
 import toObject from "./toObject";
+import { isEqualityComparer } from "@locustjs/base";
 
-const isEqualityComparer = (x) => isObject(x) && isFunction(x.equals);
 const objectify = (arr) => toObject(arr, "key-value");
+const containsAll = contains;
 
 function configureArrayExtensions(options, logger) {
   const eh = new ExtensionHelper(options, logger);
@@ -47,6 +49,14 @@ function configureArrayExtensions(options, logger) {
 
   eh.extend(Array, "contains", function (...args) {
     return contains(this, ...args);
+  });
+
+  eh.extend(Array, "containsAll", function (...args) {
+    return containsAll(this, ...args);
+  });
+
+  eh.extend(Array, "containsAny", function (...args) {
+    return containsAny(this, ...args);
   });
 
   eh.extend(Array, "objectify", function () {
@@ -113,7 +123,7 @@ function configureArrayExtensions(options, logger) {
       thisArg
     );
   });
-  
+
   const _array_findIndex = Array.prototype.findIndex;
 
   eh.extend(Array, "findIndex", function (arg, thisArg) {
@@ -140,6 +150,8 @@ export {
   joins,
   sortBy,
   contains,
+  containsAll,
+  containsAny,
   min,
   max,
   toObject,
