@@ -5,20 +5,18 @@ const tests = [
   [
     "toObject: key/value",
     function (expect) {
-      const obj = toObject(
+      const arr = [
+        ["name", "ali"],
+        ["age", 23],
         [
-          ["name", "ali"],
-          ["age", 23],
+          "address",
           [
-            "address",
-            [
-              ["city", "Tehran"],
-              ["code", "123"],
-            ],
+            ["city", "Tehran"],
+            ["code", "123"],
           ],
         ],
-        "keyvalue"
-      );
+      ];
+      const obj = toObject(arr, "keyvalue");
 
       expect(obj).toBeDefined();
       expect(obj.name).toBe("ali");
@@ -45,11 +43,9 @@ const tests = [
   [
     "toObject: values",
     function (expect) {
-      const obj = toObject(["ali", 23, ["Tehran", "123"]], "values", [
-        "name",
-        "age",
-        ["address", ["city", "code"]],
-      ]);
+      const arr = ["ali", 23, ["Tehran", "123"]];
+      const schema = ["name", "age", ["address", ["city", "code"]]];
+      const obj = toObject(arr, "values", schema);
 
       expect(obj).toBeDefined();
       expect(obj.name).toBe("ali");
@@ -62,19 +58,18 @@ const tests = [
   [
     "toObject: key/value - no type",
     function (expect) {
-      const obj = toObject(
+      const arr = [
+        ["name", "ali"],
+        ["age", 23],
         [
-          ["name", "ali"],
-          ["age", 23],
+          "address",
           [
-            "address",
-            [
-              ["city", "Tehran"],
-              ["code", "123"],
-            ],
+            ["city", "Tehran"],
+            ["code", "123"],
           ],
-        ]
-      );
+        ],
+      ];
+      const obj = toObject(arr);
 
       expect(obj).toBeDefined();
       expect(obj.name).toBe("ali");
@@ -101,11 +96,9 @@ const tests = [
   [
     "toObject: values - no type",
     function (expect) {
-      const obj = toObject(["ali", 23, ["Tehran", "123"]], [
-        "name",
-        "age",
-        ["address", ["city", "code"]],
-      ]);
+      const values = ["ali", 23, ["Tehran", "123"]];
+      const schema = ["name", "age", ["address", ["city", "code"]]];
+      const obj = toObject(values, schema);
 
       expect(obj).toBeDefined();
       expect(obj.name).toBe("ali");

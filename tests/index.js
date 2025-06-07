@@ -18,6 +18,8 @@ import test91 from "./toObject";
 import test92 from "./Array.toObject";
 import test101 from "./containsAny";
 import test102 from "./Array.containsAny";
+import test111 from "./Array.find";
+import test121 from "./Array.findIndex";
 import { TestRunner } from "@locustjs/test";
 
 const tests = [
@@ -41,6 +43,8 @@ const tests = [
   ...test92,
   ...test101,
   ...test102,
+  ...test111,
+  ...test121
 ];
 
 TestRunner.start(tests, true);

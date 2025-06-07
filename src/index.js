@@ -12,10 +12,12 @@ import removeAt from "./removeAt";
 import shuffle from "./shuffle";
 import sortBy from "./sortBy";
 import toObject from "./toObject";
-import { isEqualityComparer } from "@locustjs/base";
+import { isEqualityComparer, isFunction } from "@locustjs/base";
 
 const objectify = (arr) => toObject(arr, "key-value");
 const containsAll = contains;
+const _array_find = Array.prototype.find;
+const _array_findIndex = Array.prototype.findIndex;
 
 function configureArrayExtensions(options, logger) {
   const eh = new ExtensionHelper(options, logger);
@@ -111,29 +113,30 @@ function configureArrayExtensions(options, logger) {
 		]
 		output: { "a": 1, "b": "ali" }
 	*/
-  const _array_find = Array.prototype.find;
 
   eh.extend(Array, "find", function (arg, thisArg) {
+    const _isEqualityComparer = isEqualityComparer(thisArg);
+    const _this = _isEqualityComparer ? this : thisArg;
+
     if (isFunction(arg)) {
       return _array_find.call(this, arg, thisArg);
     }
 
-    return _array_find(
-      (x) => (isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg),
-      thisArg
+    return _array_find.call(_this, (x) =>
+      _isEqualityComparer ? thisArg.equals(x, arg) : x == arg
     );
   });
 
-  const _array_findIndex = Array.prototype.findIndex;
-
   eh.extend(Array, "findIndex", function (arg, thisArg) {
+    const _isEqualityComparer = isEqualityComparer(thisArg);
+    const _this = _isEqualityComparer ? this : thisArg;
+
     if (isFunction(arg)) {
       return _array_findIndex.call(this, arg, thisArg);
     }
 
-    return _array_findIndex(
-      (x) => (isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg),
-      thisArg
+    return _array_findIndex.call(_this, (x) =>
+      _isEqualityComparer ? thisArg.equals(x, arg) : x == arg
     );
   });
 }
@@ -147,7 +150,7 @@ export {
   all,
   any,
   objectify,
-  joins,
+  // joins,
   sortBy,
   contains,
   containsAll,
@@ -155,4 +158,6 @@ export {
   min,
   max,
   toObject,
+  _array_find,
+  _array_findIndex,
 };

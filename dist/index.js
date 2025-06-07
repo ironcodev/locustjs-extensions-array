@@ -365,6 +365,8 @@ var objectify = function objectify(arr) {
   return toObject(arr, "key-value");
 };
 var containsAll = contains;
+var _array_find = Array.prototype.find;
+var _array_findIndex = Array.prototype.findIndex;
 function configureArrayExtensions(options, logger) {
   var eh = new ExtensionHelper(options, logger);
   eh.extend(Array, "clone", function () {
@@ -460,26 +462,31 @@ function configureArrayExtensions(options, logger) {
   ]
   output: { "a": 1, "b": "ali" }
   */
-  var _array_find = Array.prototype.find;
+
   eh.extend(Array, "find", function (arg, thisArg) {
-    if (isFunction(arg)) {
+    var _isEqualityComparer = base.isEqualityComparer(thisArg);
+    var _this = _isEqualityComparer ? this : thisArg;
+    if (base.isFunction(arg)) {
       return _array_find.call(this, arg, thisArg);
     }
-    return _array_find(function (x) {
-      return base.isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
-    }, thisArg);
+    return _array_find.call(_this, function (x) {
+      return _isEqualityComparer ? thisArg.equals(x, arg) : x == arg;
+    });
   });
-  var _array_findIndex = Array.prototype.findIndex;
   eh.extend(Array, "findIndex", function (arg, thisArg) {
-    if (isFunction(arg)) {
+    var _isEqualityComparer = base.isEqualityComparer(thisArg);
+    var _this = _isEqualityComparer ? this : thisArg;
+    if (base.isFunction(arg)) {
       return _array_findIndex.call(this, arg, thisArg);
     }
-    return _array_findIndex(function (x) {
-      return base.isEqualityComparer(thisArg) ? thisArg.equals(x, arg) : x == arg;
-    }, thisArg);
+    return _array_findIndex.call(_this, function (x) {
+      return _isEqualityComparer ? thisArg.equals(x, arg) : x == arg;
+    });
   });
 }
 
+exports._array_find = _array_find;
+exports._array_findIndex = _array_findIndex;
 exports.all = all;
 exports.any = any;
 exports.configureArrayExtensions = configureArrayExtensions;
@@ -487,7 +494,6 @@ exports.contains = contains;
 exports.containsAll = containsAll;
 exports.containsAny = containsAny;
 exports.insertAt = insertAt;
-exports.joins = joins;
 exports.max = max;
 exports.min = min;
 exports.objectify = objectify;
